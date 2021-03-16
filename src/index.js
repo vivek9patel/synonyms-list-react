@@ -1,12 +1,28 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// Custom Routes
+import Create from './components/create';
+import Delete from './components/delete';
+import Show from './components/show';
+
+// Css files
+import './index.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <Router>
+    <div>
+        <Route exact path='/' component={App} />
+        <Route path='/delete/:id' component={Delete} />
+        <Route path='/create' component={Create} />
+        <Route path='/show/:id' component={Show} />
+    </div>
+    </Router>
   </React.StrictMode>,
   document.getElementById('root')
 );
