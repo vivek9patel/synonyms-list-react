@@ -42,6 +42,10 @@ export class App extends Component {
     return `https://www.google.com/search?q=define%20${wordName}`
   }
 
+  printSynonyms = (synonymsListArray) => {
+    return synonymsListArray.join(', ');
+  }
+
   onSubmit = (e)=>{
     e.preventDefault();
     const { addedWord, addedAuthor, addedSynonyms } = this.state;
@@ -70,7 +74,7 @@ export class App extends Component {
     const { addedWord, addedAuthor, addedSynonyms } = this.state;
 
     return (
-      <div className="container">
+      <div className="container mt-4">
         {/* Popup Modal */}
       <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-dialog-centered" role="document">
@@ -103,17 +107,17 @@ export class App extends Component {
       </div>
         {/* Word Table */}
         <div className="panel panel-default">
-          <div className="panel-heading">
+          <div className="panel-heading d-flex justify-content-between">
             <h3 className="panel-title">
               Words List
             </h3>
+            <h4>
+              <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Add Word
+              </button>  
+            </h4>
           </div>
           <div className="panel-body">
-            <h4>
-            <button type="button" className="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-              Add Word
-            </button>  
-            </h4>
             <table className="table table-stripe">
               <thead>
                 <tr>
@@ -126,7 +130,7 @@ export class App extends Component {
                 {this.state.words.map(word =>
                   <tr key={word.key}>
                     <td><a rel="noreferrer" href = {this.generateSeachLink(word.word)} target="_blank" title = {`More Info about '${word.word}'`}>{word.word}</a></td>
-                    <td>{word.synonyms}</td>
+                    <td>{this.printSynonyms(word.synonyms)}</td>
                     <td>{word.author}</td>
                   </tr>
                 )}
