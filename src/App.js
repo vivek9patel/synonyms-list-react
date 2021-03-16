@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import firebase from './Firebase';
+import $ from "jquery";
 
 export class App extends Component {
 
@@ -34,7 +35,7 @@ export class App extends Component {
   }
 
   componentDidMount() {
-    this.unsubscribe = this.docRef.onSnapshot(this.updateCollection); // starts the stream from firebase database
+    this.unsubscribe = this.docRef.orderBy('word','asc').onSnapshot(this.updateCollection); // starts the stream from firebase database
   }
 
   generateSeachLink = (wordName) => {
@@ -43,14 +44,56 @@ export class App extends Component {
   }
 
   printSynonyms = (synonymsListArray) => {
-    return synonymsListArray.join(', ');
+    let strJsx = []
+    for(let i = 0;i<synonymsListArray.length;i++){
+      let synonym = synonymsListArray[i];
+      if(synonym.includes(" ")){
+        strJsx.push(<b key={i}>"{synonym}"</b>)
+      }
+      else strJsx.push(<span style={{color: "green"}} key={i}>{synonym}</span>)
+      if(i !== synonymsListArray.length - 1) strJsx.push(", ")
+    }
+    return strJsx;
+  }
+
+  convertToArray = (synonymsString) => {
+    let currentStr = "", stringArray = []
+    let descStarted = false;
+    for(let i = 0;i<synonymsString.length;i++){
+      if((synonymsString[i] === " " || synonymsString[i] === ",") && descStarted === false){
+        if(currentStr.length !== 0){
+          stringArray.push(currentStr)
+          currentStr = ""
+        }
+      }
+      else if(synonymsString[i] === "\""){
+        if(descStarted === false){
+          descStarted = true;
+        }
+        else{
+          descStarted = false;
+          if(currentStr.length !== 0){
+            stringArray.push(currentStr)
+            currentStr = ""
+          }
+        }
+      }
+      else{
+        currentStr += synonymsString[i]
+      }
+    }
+      if(currentStr.length !== 0){
+        stringArray.push(currentStr)
+        currentStr = ""
+      }
+    return stringArray;
   }
 
   onSubmit = (e)=>{
     e.preventDefault();
     const { addedWord, addedAuthor, addedSynonyms } = this.state;
 
-    let synonymsListArray = addedSynonyms.split(' ');
+    let synonymsListArray = this.convertToArray(addedSynonyms);
 
     this.docRef.add({
       word: addedWord,
@@ -61,6 +104,8 @@ export class App extends Component {
     .catch((error) => {
       console.error("Error adding document: ", error);
     });
+    // close modal
+    $('#exampleModal').modal('toggle');
   }
 
   onChange = (e) => {
@@ -80,7 +125,7 @@ export class App extends Component {
         <div className="modal-dialog modal-dialog-centered" role="document">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">Modal title</h5>
+              <h5 className="modal-title" id="exampleModalLabel">Add Word to List</h5>
               <button type="button" className="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -89,15 +134,15 @@ export class App extends Component {
               <form onSubmit={this.onSubmit}>
                 <div className="form-group">
                   <label htmlFor="title">Word:</label>
-                  <input type="text" className="form-control" name="addedWord" value={addedWord} onChange={this.onChange} placeholder="Type Word Name" />
+                  <input type="text" className="form-control" name="addedWord" value={addedWord} onChange={this.onChange} placeholder="Type Word Name" required/>
                 </div>
                 <div className="form-group">
                   <label htmlFor="description">Synonyms:</label>
-                  <textarea className="form-control" name="addedSynonyms" value={addedSynonyms} onChange={this.onChange} placeholder="Add Synonyms seperated by space" cols="80" rows="3">{addedSynonyms}</textarea>
+                  <textarea className="form-control" name="addedSynonyms" value={addedSynonyms} onChange={this.onChange} placeholder="Add 'Synonyms' seperated by space and 'Description' between comma" cols="80" rows="3" required>{addedSynonyms}</textarea>
                 </div>
                 <div className="form-group">
                   <label htmlFor="author">Author:</label>
-                  <input type="text" className="form-control" name="addedAuthor" value={addedAuthor} onChange={this.onChange} placeholder="Enter Your Name" />
+                  <input type="text" className="form-control" name="addedAuthor" value={addedAuthor} onChange={this.onChange} placeholder="Enter Your Name" required/>
                 </div>
                 <button type="submit" className="btn btn-success">Submit</button>
               </form>
