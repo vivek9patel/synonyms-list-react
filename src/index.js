@@ -4,23 +4,16 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-// Custom Routes
-import Create from './components/create';
-import Delete from './components/delete';
-import Show from './components/show';
-
 // Css files
 import './index.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../node_modules/bootstrap/dist/js/bootstrap.bundle.js';
 
 ReactDOM.render(
   <React.StrictMode>
     <Router>
     <div>
         <Route exact path='/' component={App} />
-        <Route path='/delete/:id' component={Delete} />
-        <Route path='/create' component={Create} />
-        <Route path='/show/:id' component={Show} />
     </div>
     </Router>
   </React.StrictMode>,
